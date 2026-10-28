@@ -1,6 +1,7 @@
 import sys
+import os
 from character import Character
-from story import GIFT_EFFECTS
+from save_and_load import save,load
 
 class Game:
     def __init__(self):
@@ -12,8 +13,36 @@ class Game:
         }
         self.current_target = self.characters["None"]
 
+    def save_game(self):
+        save(
+            current_target=self.current_target.name,
+            affinity=self.current_target.affinity,
+            talk_turn=self.current_target.talk_turn,
+            give_gift_turn=self.current_target.give_gift_turn
+        )
+
+    def load_game(self):
+        data = load()
+        if data:
+            current_target = data['current_target']
+            self.current_target = self.characters[current_target]
+            self.current_target.affinity = data['affinity']
+            self.current_target.talk_turn = data['talk_turn']
+            self.current_target.give_gift_turn = data['give_gift_turn']
+            print(f'当前路线：【{current_target}线】')
+            return True
+        return False
+
+
     def start(self):
         print("========== 游戏开始：校园 if·恋 ==========")
+        if os.path.exists('save.json'):
+            choice = input('是否读取存档？（1.是 / 2.否）：')
+            if choice == '1':
+                if self.load_game():
+                    self.story_loop()
+                    return
+
         print("你是一名刚刚踏入大学校园的新生。")
         print("在开学典礼上，拿下压倒性成绩第一的你被选为新生代表发言。")
         print("在全场上千人的注视下，你气质非凡，发言流畅，很快成为焦点人物。")
@@ -61,7 +90,7 @@ class Game:
 
 
     def scene_jiejie(self):
-        print("\n【场景三：姐姐")
+        print("\n【场景三：姐姐】")
         print("你偶然在校外的咖啡店敲代码，一位看起来成熟知性的姐姐似乎对你感兴趣，缓缓朝你走了过来...")
         print("姐姐：『你的代码思路很有趣呢，能给我讲讲你的实现方法吗？』")
 
@@ -83,7 +112,9 @@ class Game:
             print("\n你要做什么？")
             print("1. 和她聊天")
             print("2. 送她礼物")
-            print("3. 离开（退出游戏）")
+            print("3. 存档")
+            print("4. 读档")
+            print("5. 离开（退出游戏）")
 
             choice = input("请输入选项：")
 
@@ -91,11 +122,22 @@ class Game:
             match choice:
                 case '1':
                     self.current_target.talk()
+                    # 即时存档
+                    self.save_game()
 
                 case '2':
                     self.current_target.give_gift()
+                    # 即时存档
+                    self.save_game()
 
                 case '3':
+                    self.save_game()
+                    print('\n存档成功')
+
+                case '4':
+                    self.load_game()
+
+                case '5':
                     print("你选择离开，游戏结束。")
                     sys.exit(0)
 

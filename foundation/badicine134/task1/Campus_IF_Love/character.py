@@ -1,12 +1,12 @@
 from story import *
 
 class Character:
-    def __init__(self, name, role, affinity=0):
+    def __init__(self, name, role, affinity= 0, talk_turn= 0, give_gift_turn= 0):
         self.name = name
         self.role = role
         self.affinity = affinity
-        self.talk_turn: int = 0  # learn from AI: __init__只执行一次，所以在此记录对话次数
-        self.give_gift_turn: int = 0
+        self.talk_turn = talk_turn  # learn from AI: __init__只执行一次，所以在此记录对话次数
+        self.give_gift_turn = give_gift_turn
     def talk(self):
         """
         根据对话次数不同改变对话走向,5次对话后对话库燃尽，只能通过送礼增加好感度。
